@@ -1,6 +1,6 @@
 #!/bin/bun
-import{txt2bin}from'./txt2bin';
-import{WSPrint}from'./wsprint.mjs';
+import{txt2bin}from'./modules/txt2bin';
+import{WSPrint}from'./modules/wsprint.mjs';
 
 const
 kumonoito=`
