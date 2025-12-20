@@ -2,6 +2,7 @@ const
 img2bin=({
 	genctx,img,printer_width=384,
 	background_color:bg='#fff',
+	ImageData:ImgD=ImageData,
 	transform:{rotate=0,scale=1}={},
 })=>((
 	imgwh=[img.naturalWidth,img.naturalHeight],
@@ -43,7 +44,7 @@ img2bin=({
 		].forEach(([dx,dy,d])=>(dy+=y)<cs[1]&&(dx+=x)<cs[0]&&(gs[dy][dx]+=d*e))
 	))),
 
-	ctx.putImageData(new ImageData(new Uint8ClampedArray(gs.flatMap(x=>x.flatMap(x=>[x,x,x,255]))),...cs),0,0),
+	ctx.putImageData(new ImgD(new Uint8ClampedArray(gs.flatMap(x=>x.flatMap(x=>[x,x,x,255]))),...cs),0,0),
 
 	[
 		0x1d,0x76,0x30,
