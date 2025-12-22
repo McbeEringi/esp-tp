@@ -15,6 +15,12 @@
 	<button id="trun">send txt</button><br>
 	<hr>
 	<label>source:<input type="file" id="img" accept="image/*"></label><br>
+	<label>mode:<select id="imode">
+		<option value="0">none</option>
+		<option value="1">Bayer</option>
+		<option value="2" selected>Floyd-Steinberg</option>
+		<option value="3">Atkinson</option>
+	</select></label><br>
 	<label>rotate:<input type="range" id="irotate" min="-4" max="4"></label><br>
 	<label> scale:<input type="range" id="iscale" min="0" max="1" step="0.25" value="1"></label><br><br>
 	<button id="irun">send img</button><br>
@@ -51,12 +57,12 @@
 				// 	document.body.append(c),
 				// 	c.getContext('2d')
 				// ))(document.createElement('canvas')),
-				img:x,
+				img:x,dither_mode:imode.value,
 				transform:{rotate:Math.PI/4*irotate.value,scale:iscale.value}
 			}),
 
 			x.size.forEach((x,i)=>ctx.canvas[['width','height'][i]]=x),
-			ctx.putImageData(new ImageData(new Uint8ClampedArray(x.data.flatMap(x=>x.flatMap(x=>[x,x,x,255]))),...x.size),0,0),
+			ctx.putImageData(new ImageData(new Uint8ClampedArray(x.data.flatMap(x=>[x,x,x,255])),...x.size),0,0),
 
 			ws.send(x)
 		))
