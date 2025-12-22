@@ -1,4 +1,5 @@
 #!/bin/bun
+import{createCanvas,loadImage}from'@napi-rs/canvas';
 import{txt2bin}from'./modules/txt2bin';
 import{WSPrint}from'./modules/wsprint.mjs';
 

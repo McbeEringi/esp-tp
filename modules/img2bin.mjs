@@ -2,7 +2,6 @@ const
 img2bin=({
 	genctx,img,printer_width=384,
 	background_color:bg='#fff',
-	ImageData:ImgD=ImageData,
 	transform:{rotate=0,scale=1}={},
 })=>((
 	imgwh=[img.naturalWidth,img.naturalHeight],
@@ -21,6 +20,7 @@ img2bin=({
 	ctx=genctx(...cs),
 	gs
 )=>(
+	ctx.imageSmoothingEnabled=false,
 	ctx.fillStyle=bg,
 	ctx.fillRect(0,0,...cs),
 	ctx.translate(...bb.map(x=>x/2)),
@@ -44,16 +44,14 @@ img2bin=({
 		].forEach(([dx,dy,d])=>(dy+=y)<cs[1]&&(dx+=x)<cs[0]&&(gs[dy][dx]+=d*e))
 	))),
 
-	ctx.putImageData(new ImgD(new Uint8ClampedArray(gs.flatMap(x=>x.flatMap(x=>[x,x,x,255]))),...cs),0,0),
-
-	[
+	Object.assign([
 		0x1d,0x76,0x30,
 		0,
 		...[Math.ceil(cs[0]/8),cs[1]].flatMap(x=>[x&0xff,x>>8]),
 		...gs.flatMap(x=>[...Array(Math.ceil(x.length/8))].map((_,i)=>(
 			x.slice(i*=8,i+8).reduce((a,x,i)=>((a<<1)|(x<128)),0)
 		)))
-	]
+	],{size:cs,data:gs})
 ))();
 
 export{img2bin};

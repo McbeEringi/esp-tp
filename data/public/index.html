@@ -17,7 +17,8 @@
 	<label>source:<input type="file" id="img" accept="image/*"></label><br>
 	<label>rotate:<input type="range" id="irotate" min="-4" max="4"></label><br>
 	<label> scale:<input type="range" id="iscale" min="0" max="1" step="0.25" value="1"></label><br><br>
-	<button id="irun">send img</button>
+	<button id="irun">send img</button><br>
+	<canvas id="c"></canvas>
 	<hr>
 	<script type="module">
 		import{WSPrint}from'./modules/wsprint.mjs';
@@ -25,6 +26,13 @@
 		import{img2bin}from'./modules/img2bin.mjs';
 
 		self.ws=new WSPrint('/ws').open();
+		self.ctx=c.getContext('2d');
+
+		ws.event.addEventListener('open',_=>console.log('open'));
+		ws.event.addEventListener('close',_=>console.log('close'));
+		ws.event.addEventListener('send',({detail:x})=>console.log(x));
+		ws.event.addEventListener('msg',({detail:{data:x}})=>console.log(x));
+		ws.event.addEventListener('idle',_=>console.log('idle'));
 
 		trun.onclick=_=>ws.send(txt2bin(txt.value));
 
@@ -36,7 +44,7 @@
 			})),
 			URL.revokeObjectURL(x.src),
 			
-			ws.send(img2bin({
+			x=img2bin({
 				genctx:(w,h)=>new OffscreenCanvas(w,h).getContext('2d'),
 				// genctx:(w,h)=>(c=>(
 				// 	Object.assign(c,{width:w,height:h}),
@@ -45,7 +53,12 @@
 				// ))(document.createElement('canvas')),
 				img:x,
 				transform:{rotate:Math.PI/4*irotate.value,scale:iscale.value}
-			}))
+			}),
+
+			x.size.forEach((x,i)=>ctx.canvas[['width','height'][i]]=x),
+			ctx.putImageData(new ImageData(new Uint8ClampedArray(x.data.flatMap(x=>x.flatMap(x=>[x,x,x,255]))),...x.size),0,0),
+
+			ws.send(x)
 		))
 	</script>
 </body></html>

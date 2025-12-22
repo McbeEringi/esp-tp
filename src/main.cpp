@@ -35,8 +35,6 @@ uint8_t buf[BUFLEN];
 
 struct Btn{bool a;bool b;};
 Btn btn={false,false};
-void ARDUINO_ISR_ATTR isr_btn_a(void *arg){(static_cast<Btn *>(arg))->a=true;}
-void ARDUINO_ISR_ATTR isr_btn_b(void *arg){(static_cast<Btn *>(arg))->b=true;}
 
 
 bool fs_send(AsyncWebServerRequest *req){
@@ -57,8 +55,6 @@ void setup(){
 	Serial.begin(115200);
 	escpos.begin(115200);
 	escpos.write(P_INIT);
-	attachInterruptArg(BTNA,isr_btn_a,&btn,FALLING);
-	attachInterruptArg(BTNB,isr_btn_b,&btn,FALLING);
 	delay(1000);
 
 	isAPmode=wlan(
@@ -114,11 +110,9 @@ void loop(){
 		Serial.write(buf,l);
 		ws.binaryAll(buf,l);
 	}
-	// uint8_t x=((!digitalRead(BTNA))<<1)|(!digitalRead(BTNB));
-	// if(x!=btn){
-	// 	if(x&0b10)escpos.write(P_SELF);
-	// 	btn=x;
-	// }
+	btn.a=!digitalRead(BTNA);
+	btn.b=!digitalRead(BTNB);
+	if(btn.a)ESP.restart();//escpos.write(P_SELF);
 	neopixelWrite(NPDI,
 		(sin(millis()/1000.    )*.5+.5)*16.,
 		(sin(millis()/1000.+2.1)*.5+.5)*16.,
