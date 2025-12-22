@@ -6,6 +6,7 @@ WSPrint=class{
 	ep=null;
 	event=new EventTarget();
 	reconnect=true;
+	chunk_length=1000;
 
 	constructor(w){this.ep=w;}
 	open(){
@@ -20,7 +21,10 @@ WSPrint=class{
 				e.data=='OK'?(this.queue.length?this.#send():(
 					this.sending=false,
 					this.event.dispatchEvent(new CustomEvent('idle',{detail:e}))
-				)):this.event.dispatchEvent(new CustomEvent('msg',{detail:e}))
+				)):(
+					this.sending=false,
+					this.event.dispatchEvent(new CustomEvent('msg',{detail:e}))
+				)
 			),
 			onclose:e=>(
 				this.event.dispatchEvent(new CustomEvent('close',{detail:e})),
@@ -37,7 +41,7 @@ WSPrint=class{
 			this.event.dispatchEvent(new CustomEvent('send',{detail:{remaining:this.queue.length}}))
 		);
 	}
-	#chop(w,l=512){return[...Array(Math.ceil(w.length/l))].map((_,i)=>w.slice(i*l,++i*l));}
+	#chop(w,l=this.chunk_length){return[...Array(Math.ceil(w.length/l))].map((_,i)=>w.slice(i*l,++i*l));}
 
 	send(w){
 		this.queue.push(...this.#chop(w));

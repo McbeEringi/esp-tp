@@ -27,11 +27,12 @@ w.forEach(async x=>(
 		ie.startPoll(),
 		send('ESC @'),// init
 		// send('ESC ##SBDR 80 25 00 00'),// baud 9600
-		// send('ESC ##SBDR 00 c2 01 00'),// baud 115200
+		// send('ESC ##RTFA'),// factory reset
+		send('ESC ##SBDR 00 c2 01 00'),// baud 115200
 		// send('ESC ##SLAN 00'),// pc437
-		oe.transfer(u([...Array(0xff-0x20)].map((_,i)=>i+0x20))),
+		// oe.transfer(u([...Array(0xff-0x20)].map((_,i)=>i+0x20))),
 		// oe.transfer(te.encode('hello world!\n'),console.log),
-		send('GS V 00'),// cut
+		// send('GS V 00'),// cut
 		// await delay(1000),
 		// await new Promise(_=>_),
 		await new Promise(f=>ie.stopPoll(f))

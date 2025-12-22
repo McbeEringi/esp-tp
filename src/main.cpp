@@ -22,7 +22,7 @@
 #define P_SELF "\x1b##SELF"
 
 #define BUFLEN 8
-#define MSGMAXLEN 512
+#define MSGMAXLEN 1000
 
 HardwareSerial escpos(0);
 
@@ -82,7 +82,7 @@ void setup(){
 		AsyncWebSocket *svr,AsyncWebSocketClient *cli,
 		const uint8_t *w,size_t l
 	){
-		if(MSGMAXLEN<l)cli->printf("Too long! Should be %d or less.\n",MSGMAXLEN);
+		if(MSGMAXLEN<l)cli->printf("Too long! Should be %ld or less.\n",MSGMAXLEN);
 		else{while(digitalRead(CTS))delay(50);escpos.write(w,l);cli->text("OK");}
 	});
 	svr.addHandler(&ws);
@@ -113,6 +113,19 @@ void loop(){
 	btn.a=!digitalRead(BTNA);
 	btn.b=!digitalRead(BTNB);
 	if(btn.a)ESP.restart();//escpos.write(P_SELF);
+	if(btn.b){
+		File f=FSYS.open("/public/img/card.png.bin");
+		size_t s=f.size();
+		uint8_t w[512];
+		for(size_t p=0;p<s;p+=512){
+			size_t l=min(512U,s-p);
+			f.read(w,l);
+			while(digitalRead(CTS))delay(50);
+			escpos.write(w,l);
+		}
+		f.close();
+		escpos.write((const uint8_t[]){0x1d,0x56,0},3);
+	}
 	neopixelWrite(NPDI,
 		(sin(millis()/1000.    )*.5+.5)*16.,
 		(sin(millis()/1000.+2.1)*.5+.5)*16.,

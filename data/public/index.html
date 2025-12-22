@@ -10,7 +10,11 @@
 </head><body>
 	<h1>esp-tp</h1>
 	<hr>
-
+	<label>font width :<input type="range" id="fwidth" min="0" max="7" value="0"></label><br>
+	<label>font height:<input type="range" id="fheight" min="0" max="7" value="0"></label><br>
+	<label>align:<input type="range" id="align" min="0" max="2" value="0"></label><br>
+	<button id="cutbtn">cut</button>
+	<hr>
 	<textarea id="txt"></textarea><br><br>
 	<button id="trun">send txt</button><br>
 	<hr>
@@ -30,6 +34,7 @@
 		import{WSPrint}from'./modules/wsprint.mjs';
 		import{txt2bin}from'./modules/txt2bin.mjs';
 		import{img2bin}from'./modules/img2bin.mjs';
+		import{cmd2bin}from'./modules/cmd2bin.mjs';
 
 		self.ws=new WSPrint('/ws').open();
 		self.ctx=c.getContext('2d');
@@ -39,6 +44,10 @@
 		ws.event.addEventListener('send',({detail:x})=>console.log(x));
 		ws.event.addEventListener('msg',({detail:{data:x}})=>console.log(x));
 		ws.event.addEventListener('idle',_=>console.log('idle'));
+
+		fwidth.onchange=fheight.onchange=_=>ws.send([...cmd2bin('GS !'),fwidth.value<<4|fheight.value]);
+		align.onchange=_=>ws.send([...cmd2bin('ESC a'),align.value]);
+		cutbtn.onclick=_=>ws.send(cmd2bin('GS V 00'));
 
 		trun.onclick=_=>ws.send(txt2bin(txt.value));
 
