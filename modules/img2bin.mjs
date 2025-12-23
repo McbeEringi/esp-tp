@@ -2,7 +2,7 @@ const
 img2bin=({
 	genctx,img,printer_width=384,
 	background_color:bg='#fff',
-	dither_mode=2,
+	dither_mode=2,ellipse_fit=false,
 	transform:{rotate=0,scale=1}={},
 })=>((
 	imgwh=[img.naturalWidth,img.naturalHeight],
@@ -11,7 +11,10 @@ img2bin=({
 			[x,y]=imgwh,t=rotate,
 			c=Math.cos(t),s=Math.sin(t),
 			cx=c*x,sx=s*x,cy=c*y,sy=s*y
-		)=>[
+		)=>ellipse_fit?[
+			(cx*cx+sy*sy)**.5,
+			(sx*sx+cy*cy)**.5
+		]:[
 			[0,cx,cx-sy,-sy],
 			[0,sx,sx+cy,cy]
 		].map(w=>Math.max(...w)-Math.min(...w)))(),

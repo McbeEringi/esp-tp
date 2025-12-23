@@ -22,9 +22,10 @@
 	<label>mode:<select id="imode">
 		<option value="0">none</option>
 		<option value="1">Bayer</option>
-		<option value="2" selected>Floyd-Steinberg</option>
-		<option value="3">Atkinson</option>
+		<option value="2">Floyd-Steinberg</option>
+		<option value="3" selected>Atkinson</option>
 	</select></label><br>
+	<label>ellipse_fit:<input type="checkbox" id="iellipse"></label><br>
 	<label>rotate:<input type="range" id="irotate" min="-4" max="4"></label><br>
 	<label> scale:<input type="range" id="iscale" min="0" max="1" step="0.25" value="1"></label><br><br>
 	<button id="irun">send img</button><br>
@@ -47,7 +48,10 @@
 
 		fwidth.onchange=fheight.onchange=_=>ws.send([...cmd2bin('GS !'),fwidth.value<<4|fheight.value]);
 		align.onchange=_=>ws.send([...cmd2bin('ESC a'),align.value]);
-		cutbtn.onclick=_=>ws.send(cmd2bin('GS V 00'));
+		cutbtn.onclick=_=>ws.send([
+			...cmd2bin('ESC d 06'),
+			...cmd2bin('GS V 00')
+		]);
 
 		trun.onclick=_=>ws.send(txt2bin(txt.value));
 
@@ -66,7 +70,7 @@
 				// 	document.body.append(c),
 				// 	c.getContext('2d')
 				// ))(document.createElement('canvas')),
-				img:x,dither_mode:imode.value,
+				img:x,dither_mode:imode.value,ellipse_fit:iellipse.checked,
 				transform:{rotate:Math.PI/4*irotate.value,scale:iscale.value}
 			}),
 
