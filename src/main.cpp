@@ -37,6 +37,8 @@ struct Btn{bool a;bool b;};
 Btn btn={false,false};
 
 
+void wait_cts(){while(digitalRead(CTS))delay(50);}
+
 bool fs_send(AsyncWebServerRequest *req){
 	String x=req->url();
 	if(x[x.length()-1]=='/')x+="index.html";
@@ -83,7 +85,7 @@ void setup(){
 		const uint8_t *w,size_t l
 	){
 		if(MSGMAXLEN<l)cli->printf("Too long! Should be %ld or less.\n",MSGMAXLEN);
-		else{while(digitalRead(CTS))delay(50);escpos.write(w,l);cli->text("OK");}
+		else{wait_cts();escpos.write(w,l);cli->text("OK");}
 	});
 	svr.addHandler(&ws);
 	svr.onNotFound([](AsyncWebServerRequest *req){
@@ -120,11 +122,10 @@ void loop(){
 		for(size_t p=0;p<s;p+=512){
 			size_t l=min(512U,s-p);
 			f.read(w,l);
-			while(digitalRead(CTS))delay(50);
+			wait_cts();
 			escpos.write(w,l);
 		}
 		f.close();
-		escpos.write((const uint8_t[]){0x1d,0x56,0},3);
 	}
 	neopixelWrite(NPDI,
 		(sin(millis()/1000.    )*.5+.5)*16.,
