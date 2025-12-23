@@ -49,7 +49,7 @@
 		fwidth.onchange=fheight.onchange=_=>ws.send([...cmd2bin('GS !'),fwidth.value<<4|fheight.value]);
 		align.onchange=_=>ws.send([...cmd2bin('ESC a'),align.value]);
 		cutbtn.onclick=_=>ws.send([
-			...cmd2bin('ESC d 06'),
+			// ...cmd2bin('ESC d 06'),
 			...cmd2bin('GS V 00')
 		]);
 
