@@ -6,12 +6,12 @@
 #include <ArduinoOTA.h>
 
 #define FSYS LittleFS
-#define NAME "esp-tp"
-#define PASS "mcbeeringi"
+// #define NAME "esp-tp"
+// #define PASS "mcbeeringi"
 
-#define PUB_DIR "/public/"
-#define PVT_DIR "/private/"
-#define WIFI_CFG "/private/wifi.tsv"
+// #define PUB_DIR "/public/"
+// #define PVT_DIR "/private/"
+// #define WIFI_CFG "/private/wifi.tsv"
 
 #define NPDI 1
 #define BTNA 2
@@ -26,9 +26,9 @@
 
 HardwareSerial escpos(0);
 
-static AsyncWebServer svr(80);
-static AsyncWebSocketMessageHandler wsh;
-static AsyncWebSocket ws("/ws",wsh.eventHandler());
+// static AsyncWebServer svr(80);
+// static AsyncWebSocketMessageHandler wsh;
+// static AsyncWebSocket ws("/ws",wsh.eventHandler());
 
 bool isAPmode=false;
 uint8_t buf[BUFLEN];
@@ -39,31 +39,31 @@ Btn btn={false,false};
 
 void wait_cts(){while(digitalRead(CTS))delay(50);}
 
-bool fs_send(AsyncWebServerRequest *req){
-	String x=req->url();
-	if(x[x.length()-1]=='/')x+="index.html";
-	if(FSYS.exists(x)){req->send(FSYS,x);return true;}
-	return false;
-}
+// bool fs_send(AsyncWebServerRequest *req){
+// 	String x=req->url();
+// 	if(x[x.length()-1]=='/')x+="index.html";
+// 	if(FSYS.exists(x)){req->send(FSYS,x);return true;}
+// 	return false;
+// }
 
 void setup(){
 	pinMode(BTNA,INPUT_PULLUP);
 	pinMode(BTNB,INPUT_PULLUP);
 	pinMode(CTS,INPUT);
-	isAPmode=digitalRead(BTNA)==LOW&&digitalRead(BTNB)==LOW;
-	if(isAPmode)neopixelWrite(NPDI,8,8,8);
-	else neopixelWrite(NPDI,16,0,0);
+	// isAPmode=digitalRead(BTNA)==LOW&&digitalRead(BTNB)==LOW;
+	// if(isAPmode)neopixelWrite(NPDI,8,8,8);
+	// else neopixelWrite(NPDI,16,0,0);
 	FSYS.begin();
 	Serial.begin(115200);
 	escpos.begin(115200);
 	escpos.write(P_INIT);
-	delay(1000);
-
-	isAPmode=wlan(
-		isAPmode,NPDI,
-		FSYS,WIFI_CFG,
-		NAME,PASS
-	);
+	// delay(1000);
+	//
+	// isAPmode=wlan(
+	// 	isAPmode,NPDI,
+	// 	FSYS,WIFI_CFG,
+	// 	NAME,PASS
+	// );
 
 	for(uint8_t i=8;i;--i){
 		if(isAPmode)neopixelWrite(NPDI,0,0,32);
@@ -73,33 +73,33 @@ void setup(){
 		delay(62);
 	}
 
-	ArduinoOTA
-		.setHostname(NAME).setPassword(PASS)
-		.onStart([](){ws.enable(false);ws.textAll("OTA update started.");ws.closeAll();FSYS.end();})
-		.onProgress([](unsigned int x,unsigned int a){neopixelWrite(NPDI,(a-x)*64/a,x*64/a,0);})
-		.onError([](ota_error_t e){neopixelWrite(NPDI,64,0,64);delay(3000);ws.enable(true);FSYS.begin();})
-		.begin();
-
-	wsh.onMessage([](
-		AsyncWebSocket *svr,AsyncWebSocketClient *cli,
-		const uint8_t *w,size_t l
-	){
-		if(MSGMAXLEN<l)cli->printf("Too long! Should be %ld or less.\n",MSGMAXLEN);
-		else{wait_cts();escpos.write(w,l);cli->text("OK");}
-	});
-	svr.addHandler(&ws);
-	svr.onNotFound([](AsyncWebServerRequest *req){
-		if(req->url().startsWith(PUB_DIR)&&fs_send(req))return;
-		if(req->url().startsWith(PVT_DIR)){
-			if(!req->authenticate(NAME,PASS))return req->requestAuthentication(AsyncAuthType::AUTH_BASIC);
-			else if(fs_send(req))return;
-		}
-		req->redirect(PUB_DIR);
-	});
-	svr.begin();
+	// ArduinoOTA
+	// 	.setHostname(NAME).setPassword(PASS)
+	// 	.onStart([](){ws.enable(false);ws.textAll("OTA update started.");ws.closeAll();FSYS.end();})
+	// 	.onProgress([](unsigned int x,unsigned int a){neopixelWrite(NPDI,(a-x)*64/a,x*64/a,0);})
+	// 	.onError([](ota_error_t e){neopixelWrite(NPDI,64,0,64);delay(3000);ws.enable(true);FSYS.begin();})
+	// 	.begin();
+	//
+	// wsh.onMessage([](
+	// 	AsyncWebSocket *svr,AsyncWebSocketClient *cli,
+	// 	const uint8_t *w,size_t l
+	// ){
+	// 	if(MSGMAXLEN<l)cli->printf("Too long! Should be %ld or less.\n",MSGMAXLEN);
+	// 	else{wait_cts();escpos.write(w,l);cli->text("OK");}
+	// });
+	// svr.addHandler(&ws);
+	// svr.onNotFound([](AsyncWebServerRequest *req){
+	// 	if(req->url().startsWith(PUB_DIR)&&fs_send(req))return;
+	// 	if(req->url().startsWith(PVT_DIR)){
+	// 		if(!req->authenticate(NAME,PASS))return req->requestAuthentication(AsyncAuthType::AUTH_BASIC);
+	// 		else if(fs_send(req))return;
+	// 	}
+	// 	req->redirect(PUB_DIR);
+	// });
+	// svr.begin();
 }
 void loop(){
-	ArduinoOTA.handle();
+	// ArduinoOTA.handle();
 	while(!digitalRead(CTS)&&Serial.available()){
 		uint8_t l=min(BUFLEN,Serial.available());
 		Serial.readBytes(buf,l);
@@ -110,7 +110,7 @@ void loop(){
 		uint8_t l=min(BUFLEN,escpos.available());
 		escpos.readBytes(buf,l);
 		Serial.write(buf,l);
-		ws.binaryAll(buf,l);
+		// ws.binaryAll(buf,l);
 	}
 	btn.a=!digitalRead(BTNA);
 	btn.b=!digitalRead(BTNB);
