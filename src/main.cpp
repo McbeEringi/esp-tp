@@ -32,6 +32,7 @@ HardwareSerial escpos(0);
 
 bool isAPmode=false;
 uint8_t buf[BUFLEN];
+uint8_t imgi=0;
 
 struct Btn{bool a;bool b;};
 Btn btn={false,false};
@@ -114,9 +115,9 @@ void loop(){
 	}
 	btn.a=!digitalRead(BTNA);
 	btn.b=!digitalRead(BTNB);
-	if(btn.a)ESP.restart();//escpos.write(P_SELF);
+	if(btn.a){imgi=++imgi%2;neopixelWrite(NPDI,0,0,0);while(!digitalRead(BTNA))delay(20);delay(200);for(uint8_t i=0;i<imgi+1;++i){neopixelWrite(NPDI,0,16,0);delay(150);neopixelWrite(NPDI,0,0,0);delay(150);}delay(200);}//iESP.restart();//escpos.write(P_SELF);
 	if(btn.b){
-		File f=FSYS.open("/public/img/card.png.bin");
+		File f=FSYS.open("/public/img/"+((String[]){"card","mihonsi"})[imgi]+".png.bin");
 		size_t s=f.size();
 		uint8_t w[512];
 		for(size_t p=0;p<s;p+=512){
